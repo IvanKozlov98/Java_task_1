@@ -6,7 +6,7 @@ public class Capitalizer {
         //to get length of sequence of symbols representing this "sentence"
         int len = sentence.length();
         if(len == 0)
-            return null;
+            return "";
         //in the current position we locating in word
         boolean inWord = false;
         int codePoint;
@@ -24,7 +24,7 @@ public class Capitalizer {
                 builder.appendCodePoint(Character.toLowerCase(codePoint));
             else
             {
-                builder.appendCodePoint(Character.toUpperCase(codePoint));
+                builder.appendCodePoint(Character.toTitleCase(codePoint));
                 inWord = true;
             }
             offset+=Character.charCount(codePoint);

@@ -2,6 +2,7 @@ import java.io.*;
 
 public class FileArchiever {
 
+    private final static int BUFFER_SIZE = 512;
     private Archiver archiver;
 
     public FileArchiever()
@@ -9,18 +10,24 @@ public class FileArchiever {
         archiver = new Archiver();
     }
 
-    public void compressData(Reader reader, Writer writer)throws IOException
+
+    public void compressData(FileInputStream istream, FileOutputStream ostream)throws IOException
     {
-        BufferedReader bfr = new BufferedReader(reader);
-        BufferedWriter bwr = new BufferedWriter(writer);
+        //init byte buffer
+        byte[] buffer = new byte[BUFFER_SIZE];
+        //
+        BufferedInputStream bfs = new BufferedInputStream(istream);
+        BufferedOutputStream bws = new BufferedOutputStream(ostream);
         //
         String bufferRead,bufferWrite = "";
         int lenBr,rightBoundary = 0,maxSizeCodePoint = 4;
         int currentCodePoint,prevCodePoint = -1,rightCodePoint = 0;
         String tail = "";
+        int countRead = -1;
         //main loop
-        while((bufferRead = bfr.readLine()) != null)
+        while((countRead = bfs.read(buffer)) != -1)
         {
+            bufferRead = new String(buffer,0,countRead);
             //append prev tail
             bufferRead = tail + bufferRead;
             //work with bufferRead
@@ -42,16 +49,15 @@ public class FileArchiever {
                 bufferWrite = archiver.getCompressData(bufferWrite);
                 //specify tail as
                 tail = bufferRead.substring(rightBoundary,bufferRead.length());
-                bwr.write(bufferWrite);
+                bws.write(bufferWrite.getBytes());
             }
             else
                 tail = bufferRead;
         }
         //at now archive last tail
         bufferWrite = archiver.getCompressData(tail);
-        bwr.write(bufferWrite);
-        bwr.close();
-        bfr.close();
+        bws.write(bufferWrite.getBytes());
+        bws.close();
+        bfs.close();
     }
-
 }
