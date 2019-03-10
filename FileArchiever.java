@@ -2,7 +2,7 @@ import java.io.*;
 
 public class FileArchiever {
 
-    public void compressData(FileInputStream istream, FileOutputStream ostream)
+    public void compressData(FileInputStream istream, FileOutputStream ostream)throws IOException
     {
         //
         try(
@@ -35,9 +35,6 @@ public class FileArchiever {
                 bws.write(countOfByte % 10);
                 countOfByte/=10;
             }
-        }catch (IOException e)
-        { ; }
-        //
-
+        }
     }
 }
