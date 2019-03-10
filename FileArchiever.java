@@ -1,4 +1,7 @@
+import com.sun.deploy.util.ArrayUtil;
+
 import java.io.*;
+import java.lang.reflect.Array;
 
 public class FileArchiever {
 
@@ -12,6 +15,8 @@ public class FileArchiever {
             //init
             int currentByte = -1,prevByte = bfs.read();
             int countOfByte = 1;
+            int[] numbers = new int[1024];
+            int lenNumbers = 0;
             //
             while((currentByte = bfs.read()) != -1)
             {
@@ -21,11 +26,15 @@ public class FileArchiever {
                 {
                     bws.write(prevByte);
                     while(countOfByte != 0) {
-                        bws.write(countOfByte % 10);
+                        numbers[lenNumbers] = countOfByte % 10;//in this case i can do it(0..9)
+                        lenNumbers++;
                         countOfByte/=10;
                     }
+                    for(int i = lenNumbers - 1;i >= 0;--i)
+                        bws.write(numbers[i]);
                     //update
                     countOfByte = 1;
+                    lenNumbers = 0;
                 }
                 prevByte = currentByte;
             }
