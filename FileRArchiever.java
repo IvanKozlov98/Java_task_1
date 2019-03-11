@@ -1,7 +1,7 @@
 import java.io.*;
 
 public class FileRArchiever {
-    
+
     public void decompressData(FileInputStream istream, FileOutputStream ostream)throws IOException
     {
         try(BufferedInputStream bfs = new BufferedInputStream(istream);
