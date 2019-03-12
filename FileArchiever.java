@@ -5,6 +5,8 @@ import java.lang.reflect.Array;
 
 public class FileArchiever {
 
+    private static final int BASE_NUMBER_SYSTEM = 255;
+
     public void compressData(FileInputStream istream, FileOutputStream ostream)throws IOException
     {
         //
@@ -17,9 +19,7 @@ public class FileArchiever {
             //if file is empty
             if((prevByte = bfs.read()) == -1)
                 return;
-            int countOfByte = 1;
-            int[] numbers = new int[1024];
-            int lenNumbers = 0;
+            long countOfByte = 1;
             //
             while((currentByte = bfs.read()) != -1)
             {
@@ -27,26 +27,29 @@ public class FileArchiever {
                     countOfByte++;
                 else//write this
                 {
+                    //числа будем кодировать в 255-ой системе счисления => записывать коэффициенты при соответствующих степенях
+                    //т.е если number = a*255^0 + b*255^1 + c*255^2 .. -> закодируем это в виде abc...255
+                    //пишем в конце записи числа - 255
                     bws.write(prevByte);
-                    while(countOfByte != 0) {
-                        numbers[lenNumbers] = countOfByte % 10;//in this case i can do it(0..9)
-                        lenNumbers++;
-                        countOfByte/=10;
-                    }
-                    for(int i = lenNumbers - 1;i >= 0;--i)
-                        bws.write(numbers[i]);
-                    //update
+                    do{
+                        bws.write((int)(countOfByte % BASE_NUMBER_SYSTEM));
+                        countOfByte/=BASE_NUMBER_SYSTEM;
+                    }while(countOfByte != 0);
+                    //to add mark
+                    bws.write(BASE_NUMBER_SYSTEM);
+                    //update values
                     countOfByte = 1;
-                    lenNumbers = 0;
                 }
                 prevByte = currentByte;
             }
             //at the end to write
             bws.write(prevByte);
-            while(countOfByte != 0) {
-                bws.write(countOfByte % 10);
-                countOfByte/=10;
-            }
+            do{
+                bws.write((int)(countOfByte % BASE_NUMBER_SYSTEM));
+                countOfByte/=BASE_NUMBER_SYSTEM;
+            }while(countOfByte != 0);
+            //to add mark
+            bws.write(BASE_NUMBER_SYSTEM);
         }
     }
 }
