@@ -15,7 +15,7 @@ class MyComparator implements Comparator<List<Path>>
         try {
             if(listOfPath1.isEmpty() || listOfPath2.isEmpty())
                 throw new RuntimeException();
-            comp = compare(listOfPath1.get(0),listOfPath2.get(0));
+            comp = Deduplicator.compare(listOfPath1.get(0),listOfPath2.get(0));
         }catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -23,10 +23,19 @@ class MyComparator implements Comparator<List<Path>>
                 (comp < 0) ? -1:
                  0;
     }
-    //-то же, что и compare в Dedublicator-е только возвращает не разницу несовпавших байт, а их разность
-    private static long compare(Path file1,Path file2)throws IOException
+};
+
+
+
+
+public class Deduplicator {
+
+    public static long compare(Path file1,Path file2)throws IOException
     {
         //better throw exception ?
+        if(Files.isDirectory(file1) || Files.isDirectory(file2))
+            return 0;
+        //
         long diff = Files.size(file1) - Files.size(file2);
         if(diff != 0)
             return diff;
@@ -44,43 +53,6 @@ class MyComparator implements Comparator<List<Path>>
                     diff = byte1 - byte2;
                     if (diff != 0)
                         return diff;
-                }
-            }
-            else
-                throw new IOException();//???????
-        }
-        return 0;
-    }
-};
-
-
-
-
-public class Deduplicator {
-
-    public static long compare(Path file1,Path file2)throws IOException
-    {
-        //better throw exception ?
-        if(Files.isDirectory(file1) || Files.isDirectory(file2))
-            return 0;
-        //
-        long diff = Files.size(file1) - Files.size(file2);
-        if(diff != 0)
-            return Math.abs(diff);
-        //otherwise
-        int byte1,byte2;
-        try(
-                BufferedInputStream f1 = new BufferedInputStream(Files.newInputStream(file1));
-                BufferedInputStream f2 = new BufferedInputStream(Files.newInputStream(file2));
-        ){
-            if(Files.isReadable(file1) && Files.isReadable(file2)) {
-                //size files are same
-                while ((byte1 = f1.read()) != -1)//read byte from file1
-                {
-                    byte2 = f2.read();//then read byte from file2
-                    diff = byte1 - byte2;
-                    if (diff != 0)
-                        return Math.abs(diff);
                 }
             }
             else
